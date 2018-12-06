@@ -257,11 +257,11 @@ multicornGetForeignRelSize(PlannerInfo *root,
 
 		for (i = 0; i < desc->natts; i++)
 		{
-			Form_pg_attribute att = desc->attrs[i];
+			FormData_pg_attribute att = desc->attrs[i];
 
-			if (!att->attisdropped)
+			if (!att.attisdropped)
 			{
-				planstate->target_list = lappend(planstate->target_list, makeString(NameStr(att->attname)));
+				planstate->target_list = lappend(planstate->target_list, makeString(NameStr(att.attname)));
 			}
 		}
 	}
@@ -599,17 +599,17 @@ multicornAddForeignUpdateTargets(Query *parsetree,
 
 	for (i = 0; i < desc->natts; i++)
 	{
-		Form_pg_attribute att = desc->attrs[i];
+		FormData_pg_attribute att = desc->attrs[i];
 
-		if (!att->attisdropped)
+		if (!att.attisdropped)
 		{
-			if (strcmp(NameStr(att->attname), attrname) == 0)
+			if (strcmp(NameStr(att.attname), attrname) == 0)
 			{
 				var = makeVar(parsetree->resultRelation,
-							  att->attnum,
-							  att->atttypid,
-							  att->atttypmod,
-							  att->attcollation,
+							  att.attnum,
+							  att.atttypid,
+							  att.atttypmod,
+							  att.attcollation,
 							  0);
 				break;
 			}
@@ -681,11 +681,11 @@ multicornBeginForeignModify(ModifyTableState *mtstate,
 	}
 	for (i = 0; i < desc->natts; i++)
 	{
-		Form_pg_attribute att = desc->attrs[i];
+		FormData_pg_attribute att = desc->attrs[i];
 
-		if (!att->attisdropped)
+		if (!att.attisdropped)
 		{
-			if (strcmp(NameStr(att->attname), modstate->rowidAttrName) == 0)
+			if (strcmp(NameStr(att.attname), modstate->rowidAttrName) == 0)
 			{
 				modstate->rowidCinfo = modstate->cinfos[i];
 				break;

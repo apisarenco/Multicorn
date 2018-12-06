@@ -459,18 +459,18 @@ getColumnsFromTable(TupleDesc desc, PyObject **p_columns, List **columns)
 
 		for (i = 0; i < desc->natts; i++)
 		{
-			Form_pg_attribute att = desc->attrs[i];
+			FormData_pg_attribute att = desc->attrs[i];
 
-			if (!att->attisdropped)
+			if (!att.attisdropped)
 			{
-				Oid			typOid = att->atttypid;
+				Oid			typOid = att.atttypid;
 
-				char	   *key = NameStr(att->attname);
-				int32		typmod = att->atttypmod;
+				char	   *key = NameStr(att.attname);
+				int32		typmod = att.atttypmod;
 				char	   *base_type = format_type_be(typOid);
 				char	   *modded_type = format_type_with_typemod(typOid, typmod);
-				List	   *options = GetForeignColumnOptions(att->attrelid,
-															  att->attnum);
+				List	   *options = GetForeignColumnOptions(att.attrelid,
+															  att.attnum);
 				PyObject   *p_options = optionsListToPyDict(options);
 				PyObject   *column = PyObject_CallFunction(p_columnclass,
 														   "(s,i,i,s,s,O)",
@@ -1214,8 +1214,8 @@ pythonDictToTuple(PyObject *p_value,
 	for (i = 0; i < slot->tts_tupleDescriptor->natts; i++)
 	{
 		char	   *key;
-		Form_pg_attribute attr = slot->tts_tupleDescriptor->attrs[i];
-		AttrNumber	cinfo_idx = attr->attnum - 1;
+		FormData_pg_attribute attr = slot->tts_tupleDescriptor->attrs[i];
+		AttrNumber	cinfo_idx = attr.attnum - 1;
 
 		if (cinfos[cinfo_idx] == NULL)
 		{
@@ -1263,8 +1263,8 @@ pythonSequenceToTuple(PyObject *p_value,
 	for (i = 0, j = 0; i < slot->tts_tupleDescriptor->natts; i++)
 	{
 		PyObject   *p_object;
-		Form_pg_attribute attr = slot->tts_tupleDescriptor->attrs[i];
-		AttrNumber	cinfo_idx = attr->attnum - 1;
+		FormData_pg_attribute attr = slot->tts_tupleDescriptor->attrs[i];
+		AttrNumber	cinfo_idx = attr.attnum - 1;
 
 		if (cinfos[cinfo_idx] == NULL)
 		{
@@ -1658,13 +1658,13 @@ tupleTableSlotToPyObject(TupleTableSlot *slot, ConversionInfo ** cinfos)
 
 	for (i = 0; i < tupdesc->natts; i++)
 	{
-		Form_pg_attribute attr = tupdesc->attrs[i];
+		FormData_pg_attribute attr = tupdesc->attrs[i];
 		bool		isnull;
 		Datum		value;
 		PyObject   *item;
-		AttrNumber	cinfo_idx = attr->attnum - 1;
+		AttrNumber	cinfo_idx = attr.attnum - 1;
 
-		if (attr->attisdropped || cinfos[cinfo_idx] == NULL)
+		if (attr.attisdropped || cinfos[cinfo_idx] == NULL)
 		{
 			continue;
 		}

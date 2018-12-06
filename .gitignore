@@ -2,9 +2,12 @@
 tags
 *.so
 *.o
+*.bc
 *egg-info
+directories.stamp
 sql/multicorn--*.sql
 *.pyc
+/.vscode
 /build
 /dist
 /results

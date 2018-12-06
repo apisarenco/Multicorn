@@ -103,26 +103,26 @@ initConversioninfo(ConversionInfo ** cinfos, AttInMetadata *attinmeta)
 
 	for (i = 0; i < attinmeta->tupdesc->natts; i++)
 	{
-		Form_pg_attribute attr = attinmeta->tupdesc->attrs[i];
+		FormData_pg_attribute attr = attinmeta->tupdesc->attrs[i];
 		Oid			outfuncoid;
 		bool		typIsVarlena;
 
 
 
-		if (!attr->attisdropped)
+		if (!attr.attisdropped)
 		{
 			ConversionInfo *cinfo = palloc0(sizeof(ConversionInfo));
 
 			cinfo->attoutfunc = (FmgrInfo *) palloc0(sizeof(FmgrInfo));
-			getTypeOutputInfo(attr->atttypid, &outfuncoid, &typIsVarlena);
+			getTypeOutputInfo(attr.atttypid, &outfuncoid, &typIsVarlena);
 			fmgr_info(outfuncoid, cinfo->attoutfunc);
-			cinfo->atttypoid = attr->atttypid;
+			cinfo->atttypoid = attr.atttypid;
 			cinfo->atttypmod = attinmeta->atttypmods[i];
 			cinfo->attioparam = attinmeta->attioparams[i];
 			cinfo->attinfunc = &attinmeta->attinfuncs[i];
-			cinfo->attrname = NameStr(attr->attname);
+			cinfo->attrname = NameStr(attr.attname);
 			cinfo->attnum = i + 1;
-			cinfo->attndims = attr->attndims;
+			cinfo->attndims = attr.attndims;
 			cinfo->need_quote = false;
 			cinfos[i] = cinfo;
 		}
@@ -431,7 +431,7 @@ Value *
 colnameFromVar(Var *var, PlannerInfo *root, MulticornPlanState * planstate)
 {
 	RangeTblEntry *rte = rte = planner_rt_fetch(var->varno, root);
-	char	   *attname = get_attname(rte->relid, var->varattno);
+	char	   *attname = get_attname(rte->relid, var->varattno, true);
 
 	if (attname == NULL)
 	{
@@ -723,7 +723,7 @@ deparse_sortgroup(PlannerInfo *root, Oid foreigntableid, RelOptInfo *rel)
 			if (IsA(expr, Var))
 			{
 				Var *var = (Var *) expr;
-				md->attname = (Name) strdup(get_attname(foreigntableid, var->varattno));
+				md->attname = (Name) strdup(get_attname(foreigntableid, var->varattno, true));
 				md->attnum = var->varattno;
 				found = true;
 			}
@@ -738,7 +738,7 @@ deparse_sortgroup(PlannerInfo *root, Oid foreigntableid, RelOptInfo *rel)
 					md->collate = NULL;
 				else
 					md->collate = (Name) strdup(get_collation_name(collid));
-				md->attname = (Name) strdup(get_attname(foreigntableid, var->varattno));
+				md->attname = (Name) strdup(get_attname(foreigntableid, var->varattno, true));
 				md->attnum = var->varattno;
 				found = true;
 			}
